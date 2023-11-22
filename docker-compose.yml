@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./books_store_web/Dockerfile
+    restart: always
+    container_name: web
+    command: >
+      sh -c "python3 manage.py migrate &&
+             python3 manage.py collectstatic --noinput &&
+             exec gunicorn core.wsgi:application -b 0.0.0.0:$WEB_PORT --log-level debug"
+    volumes:
+      - books_store_web_static_value:/app/web-static/
+      - books_store_web_media_value:/app/web-media/
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    image: mysql
+    restart: always
+    container_name: db
+    ports:
+      - "3306:3306"
+    volumes:
+      - books_store_web_mysqldata:/var/lib/mysql
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 80s
+
+  redis:
+    image: "redis:alpine"
+    restart: always
+    container_name: redis
+    volumes:
+      - books_store_web_redis_data:/data
+    expose:
+      - "6379"
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./books_store_web/Dockerfile
+    container_name: celery_worker
+    command: celery -A core worker --loglevel=info
+    depends_on:
+      - web
+      - db
+      - redis
+    env_file:
+      - .env
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./books_store_web/Dockerfile
+    env_file:
+      - .env
+    container_name: flower_app
+    command: celery -A core flower
+    depends_on:
+      - redis
+      - celery_worker
+    ports:
+      - "5555:5555"
+
+volumes:
+  books_store_web_mysqldata:
+    name: books_store_web_mysqldata
+  books_store_web_static_value:
+    name: books_store_web_static_value
+  books_store_web_media_value:
+    name: books_store_web_media_value
+  books_store_web_redis_data:
+    name: books_store_web_redis_data
