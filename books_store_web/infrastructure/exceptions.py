@@ -18,5 +18,9 @@ class NoAuthorsAvailable(Exception):
     """Ни одного автора не найдено."""
 
 
+class UserAlreadyExists(Exception):
+    """Пользователь уже существует."""
+
+
 class BookNotFound(Exception):
     """Книга не найдена."""

@@ -13,6 +13,7 @@ repos:
     -   id: double-quote-string-fixer  # заменяет " на '
         exclude: settings.py|manage.py|migrations
     -   id: end-of-file-fixer  # добавляет пустую строку в конце файла
+        exclude: requirements.txt
 
 # Отсортировывает импорты в проекте
 -   repo: https://github.com/pycqa/isort
