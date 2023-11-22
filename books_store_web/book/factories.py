@@ -1,10 +1,11 @@
+from book.models import Author, Book
 from factory import Faker
 from factory.django import DjangoModelFactory
 
-from book.models import Author, Book
-
 
 class AuthorFactory(DjangoModelFactory):
+    """Фабрика для создания тестовых авторов."""
+
     class Meta:
         model = Author
 
@@ -13,6 +14,8 @@ class AuthorFactory(DjangoModelFactory):
 
 
 class BookFactory(DjangoModelFactory):
+    """Фабрика для создания тестовых книг."""
+
     class Meta:
         model = Book
 

@@ -1,7 +1,8 @@
-from django.test import TestCase, Client
-from book.factories import AuthorFactory, BookFactory
 import json
 from http import HTTPStatus
+
+from book.factories import AuthorFactory, BookFactory
+from django.test import Client, TestCase
 
 BASE_URL = '/api/v1'
 
