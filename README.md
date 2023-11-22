@@ -21,11 +21,12 @@ This project is a test task for likesoft.
    ```bash
    git clone https://github.com/kirillovme/books_store.git
    ```
-2. Start the containers
+2. Complete Email settings in .env if needed.
+3. Start the containers
    ```bash
    make up-d
    ```
-3. Make tests if needed
+4. Make tests if needed
     ```bash
     make tests
     ```
